@@ -24,6 +24,8 @@ ChangeLog
 2.0.0.1
 	Added functionality for stock skin
 	Fixed mass/twr calculations for RO
-	Added adjustable font setttings
+	Added adjustable font settings
 	Added scene specific save locations (editor & flight).  Settings window only has a single location saved
+	Added color to fonts
+
 

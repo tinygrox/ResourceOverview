@@ -61,11 +61,8 @@ namespace PluginBaseFramework
                 if (useKSPskin)
                     GUI.skin = HighLogic.Skin;
              preDrawGui();
-               windowPosition = GUILayout.Window(windowID, windowPosition, drawGui, windowTitle,
-                    GUILayout.Width(windowWidth), // overwrite values from windowPosition
-                    GUILayout.Height(windowHeight));
+               windowPosition = GUILayout.Window(windowID, windowPosition, drawGui, windowTitle);
             }
-
         }
 
         protected abstract void preDrawGui();

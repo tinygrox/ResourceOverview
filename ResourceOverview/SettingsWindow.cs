@@ -47,7 +47,7 @@ namespace ResourceOverview
             KSPSettings.useBoldFont = GUILayout.Toggle(KSPSettings.useBoldFont, "Use Bold Font");
             KSPSettings.useCompactSpacing = GUILayout.Toggle(KSPSettings.useCompactSpacing, "Use Compact Spacing");
             GUILayout.BeginHorizontal();
-            GUILayout.Label("fontSize:");
+            GUILayout.Label("Font Size:");
             KSPSettings.fontSize = GUILayout.HorizontalSlider(KSPSettings.fontSize, 9f, 15f);
             GUILayout.EndHorizontal();
 

@@ -14,8 +14,7 @@ namespace ResourceOverview
     partial class ResourceOverview
     {
         const double g = 9.81f;
-        static GUIStyle activeWhiteFont;
-        static GUIStyle activeGreenFont;
+        static GUIStyle activeFont;
 
         private Dictionary<String, DisplayResource> resourceList = new Dictionary<String, DisplayResource>();
         public bool vesselDataFetched = false;
@@ -298,25 +297,26 @@ namespace ResourceOverview
             if (KSPSettings.useStockSkin)
             {
                 if (KSPSettings.useBoldFont)
-                    activeWhiteFont = new GUIStyle(RegisterToolbar.boldStockFont);
+                    activeFont = new GUIStyle(RegisterToolbar.boldStockFont);
                 else
-                    activeWhiteFont = new GUIStyle(RegisterToolbar.stockFont);
+                    activeFont = new GUIStyle(RegisterToolbar.stockFont);
             }
             else
             {
                 if (KSPSettings.useBoldFont)
-                    activeWhiteFont = new GUIStyle(RegisterToolbar.boldFont);
+                    activeFont = new GUIStyle(RegisterToolbar.boldFont);
                 else
-                    activeWhiteFont = new GUIStyle(RegisterToolbar.font);
+                    activeFont = new GUIStyle(RegisterToolbar.font);
 
             }
-            activeWhiteFont.fontSize = (int)KSPSettings.fontSize;
-            if (KSPSettings.useCompactSpacing)
-                activeWhiteFont.padding = new RectOffset();
+            activeFont.fontSize = (int)Math.Round(KSPSettings.fontSize);
 
-            activeWhiteFont.normal.textColor = Color.white;
-            activeGreenFont = new GUIStyle(activeWhiteFont);
-            activeGreenFont.normal.textColor = Color.green;
+            // width
+
+            if (KSPSettings.useCompactSpacing)
+                activeFont.padding = new RectOffset();
+
+            activeFont.normal.textColor = Color.white;
         }
 
         protected override void drawGui(int windowID)
@@ -332,16 +332,31 @@ namespace ResourceOverview
             if (HighLogic.LoadedSceneIsFlight || EditorLogic.RootPart != null)
             {
                 reloadVesselData();
-                if (KSPSettings.showTotalMass) GUILayout.Label("Total Mass: " + String.Format("{0:,0.00}", vesselTotalMass * 1000), activeWhiteFont, GUILayout.ExpandWidth(true));
-                if (KSPSettings.showDryMass) GUILayout.Label("Dry Mass: " + String.Format("{0:,0.00}", vesselDryMass * 1000), activeWhiteFont, GUILayout.ExpandWidth(true));
-                if (KSPSettings.showCrewCapacity) GUILayout.Label("Crew Capacity: " + vesselCrewCapacity, activeWhiteFont, GUILayout.ExpandWidth(true));
-                if (KSPSettings.showPartCount) GUILayout.Label("Part Count: " + vesselPartCount, activeWhiteFont, GUILayout.ExpandWidth(true));
-                if (KSPSettings.showTWR) GUILayout.Label("TWR: " + String.Format("{0:,0.00}", vesselTWR), activeWhiteFont, GUILayout.ExpandWidth(true));
+                if (KSPSettings.showTotalMass)
+                {
+                    GUILayout.Label("Total Mass: <color=#32cd32>" + String.Format("{0:,0.00}</color>", vesselTotalMass * 1000), activeFont);
+                }
+                if (KSPSettings.showDryMass)
+                {
+                    GUILayout.Label("Dry Mass: <color=#32cd32>" + String.Format("{0:,0.00}</color>", vesselDryMass * 1000), activeFont);
+                }
+                if (KSPSettings.showCrewCapacity)
+                {
+                    GUILayout.Label("Crew Capacity: <color=#32cd32>" + vesselCrewCapacity + "</color>", activeFont);
+                }
+                if (KSPSettings.showPartCount)
+                {
+                    GUILayout.Label("Part Count: <color=#32cd32>" + vesselPartCount + "</color>", activeFont);
+                }
+                if (KSPSettings.showTWR)
+                {
+                    GUILayout.Label("TWR: <color=#32cd32>" + String.Format("{0:,0.00}</color>", vesselTWR), activeFont);
+                }
                 GUILayout.Space(10);
-
+                //GUILayout.Label("<HL>");
                 foreach (String key in resourceList.Keys)
                 {
-                    GUILayout.Label(key + ": " + String.Format("{0:,0.00}", resourceList[key].amount) + " / " + String.Format("{0:,0.00}", resourceList[key].maxAmount), activeWhiteFont, GUILayout.ExpandWidth(true));
+                    GUILayout.Label(key + ": <color=#32cd32>" + String.Format("{0:,0.00}", resourceList[key].amount) + "</color>/<color=#7cfc00>" + String.Format("{0:,0.00}</color>", resourceList[key].maxAmount), activeFont, GUILayout.ExpandWidth(true));
                 }
 
             }
