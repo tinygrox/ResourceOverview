@@ -13,6 +13,9 @@ namespace ResourceOverview
 {
     partial class ResourceOverview
     {
+        const double g = 9.81f;
+        static GUIStyle activeWhiteFont;
+        static GUIStyle activeGreenFont;
 
         private Dictionary<String, DisplayResource> resourceList = new Dictionary<String, DisplayResource>();
         public bool vesselDataFetched = false;
@@ -33,7 +36,6 @@ namespace ResourceOverview
         public void onSettingsChanged()
         {
             KSPSettings.load();
-            Log.Info("onSettingsChanged");
         }
 
         void SetUpUpdateCoroutine()
@@ -65,7 +67,6 @@ namespace ResourceOverview
 
         private void setFetchVesselData()
         {
-            Log.Info("vessel data will be refetched");
             vesselDataFetched = false;
             vesselTotalMass = 0;
             vesselCrewCapacity = 0;
@@ -76,7 +77,7 @@ namespace ResourceOverview
         }
 
 
-         Vector3 SetDirection(int ctrlDir, Vessel vessel)
+        Vector3 SetDirection(int ctrlDir, Vessel vessel)
         {
             if (ctrlDir == 0)
             {
@@ -107,26 +108,26 @@ namespace ResourceOverview
                 return (vessel.rootPart.transform.up);
             }
         }
-         int controlDirection = 0; //control direction         
-         ModuleEngines TWR1EngineModule;
-         ModuleEnginesFX TWR1EngineModuleFX;
+        int controlDirection = 0; //control direction         
 
-        public  double GetThrustInfo(double altitude, out double minThrust, out double maxThrust)
+        public double GetThrustInfo(double altitude, out double outMinThrust, out double outMaxThrust)
         {
             Vessel activeVessel = FlightGlobals.ActiveVessel;
 
-            double TWR1MaxThrust = 0;
-            double TWR1MaxThrustVertical = 0;
-            double TWR1MinThrust = 0;
-            double TWR1MinThrustVertical = 0;
+            double maxThrust = 0;
+            double maxThrustVertical = 0;
+            double minThrust = 0;
+            double minThrustVertical = 0;
 
             double actualThrustLastFrame = 0;
-            var TWR1ControlUp = SetDirection(controlDirection, activeVessel);
+            var controlUp = SetDirection(controlDirection, activeVessel);
             for (int i = 0; i < activeVessel.Parts.Count; i++)
             {
                 Part part = activeVessel.Parts[i];
-                if (part.Modules.Contains("ModuleEngines") || part.Modules.Contains("ModuleEnginesFX")) //is part an engine?
+                if (part.Modules.Contains<ModuleEngines>())
                 {
+                    //if (part.Modules.Contains("ModuleEngines") || part.Modules.Contains("ModuleEnginesFX") || part.Modules.Contains("ModuleEnginesRF")) //is part an engine?
+
                     float DavonThrottleID = 0;
                     if (part.Modules.Contains("DifferentialThrustEngineModule")) //Devon Throttle Control Installed?
                     {
@@ -142,73 +143,42 @@ namespace ResourceOverview
                     }
                     if (DavonThrottleID == 0f)
                     {
-                        foreach (PartModule TWR1PartModule in part.Modules) //change from part to partmodules
+                        foreach (var engineModule in part.Modules.OfType<ModuleEngines>())
                         {
-                            if (TWR1PartModule.moduleName == "ModuleEngines") //find partmodule engine on th epart
+                            double offsetMultiplier;
+                            try
                             {
-                                TWR1EngineModule = (ModuleEngines)TWR1PartModule; //change from partmodules to moduleengines
-
-                                double offsetMultiplier;
-                                try
-                                {
-                                    offsetMultiplier = Math.Max(0, Math.Cos(Mathf.Deg2Rad * Vector3.Angle(TWR1EngineModule.thrustTransforms[0].forward, -TWR1ControlUp)));
-                                }
-                                catch
-                                {
-                                    offsetMultiplier = 1;
-                                }
-
-                                if ((bool)TWR1PartModule.Fields.GetValue("throttleLocked") && TWR1EngineModule.isOperational)//if throttlelocked is true, this is solid rocket booster. then check engine is operational. if the engine is flamedout, disabled via-right click or not yet activated via stage control, isOperational returns false
-                                {
-                                    TWR1MaxThrust += ((TWR1EngineModule.finalThrust) * offsetMultiplier); //add engine thrust to MaxThrust
-                                    TWR1MaxThrustVertical += (double)(TWR1EngineModule.finalThrust);
-                                    TWR1MinThrust += ((TWR1EngineModule.finalThrust) * offsetMultiplier); //add engine thrust to MinThrust since this is an SRB
-                                    TWR1MinThrustVertical += (double)(TWR1EngineModule.finalThrust);
-                                }
-                                else if (TWR1EngineModule.isOperational)//we know it is an engine and not a solid rocket booster so:
-                                {
-                                    TWR1MaxThrust += ((TWR1EngineModule.maxFuelFlow * TWR1EngineModule.g * TWR1EngineModule.atmosphereCurve.Evaluate((float)(TWR1EngineModule.vessel.staticPressurekPa * PhysicsGlobals.KpaToAtmospheres)) * TWR1EngineModule.thrustPercentage / 100F) * offsetMultiplier); //add engine thrust to MaxThrust
-                                                                                                                                                                                                                                                                                                                    // errLine = "16d1";
-                                    TWR1MaxThrustVertical += ((TWR1EngineModule.maxFuelFlow * TWR1EngineModule.g * TWR1EngineModule.atmosphereCurve.Evaluate((float)(TWR1EngineModule.vessel.staticPressurekPa * PhysicsGlobals.KpaToAtmospheres)) * TWR1EngineModule.thrustPercentage / 100F));
-                                }
-                                actualThrustLastFrame += TWR1EngineModule.finalThrust * (float)offsetMultiplier;
+                                offsetMultiplier = Math.Max(0, Math.Cos(Mathf.Deg2Rad * Vector3.Angle(engineModule.thrustTransforms[0].forward, -controlUp)));
                             }
-                            else if (TWR1PartModule.moduleName == "ModuleEnginesFX") //find partmodule engine on th epart
+                            catch
                             {
-                                TWR1EngineModuleFX = (ModuleEnginesFX)TWR1PartModule; //change from partmodules to moduleengines
-                                double offsetMultiplier;
-                                try
-                                {
-                                    offsetMultiplier = Math.Cos(Mathf.Deg2Rad * Vector3.Angle(TWR1EngineModuleFX.thrustTransforms[0].forward, -TWR1ControlUp)); //how far off vertical is this engine?
-                                }
-                                catch
-                                {
-                                    offsetMultiplier = 1;
-                                }
-                                if ((bool)TWR1PartModule.Fields.GetValue("throttleLocked") && TWR1EngineModuleFX.isOperational)//if throttlelocked is true, this is solid rocket booster. then check engine is operational. if the engine is flamedout, disabled via-right click or not yet activated via stage control, isOperational returns false
-                                {
-                                    TWR1MaxThrust += (double)((TWR1EngineModuleFX.finalThrust) * offsetMultiplier); //add engine thrust to MaxThrust
-                                    TWR1MaxThrustVertical += (double)TWR1EngineModuleFX.finalThrust;
-                                    TWR1MinThrust += (double)((TWR1EngineModuleFX.finalThrust) * offsetMultiplier); //add engine thrust to MinThrust since this is an SRB
-                                    TWR1MinThrustVertical += TWR1EngineModuleFX.finalThrust;
-                                }
-                                else if (TWR1EngineModuleFX.isOperational)//we know it is an engine and not a solid rocket booster so:
-                                {
-                                    TWR1MaxThrust += (double)((TWR1EngineModuleFX.maxFuelFlow * TWR1EngineModuleFX.g * TWR1EngineModuleFX.atmosphereCurve.Evaluate((float)(TWR1EngineModuleFX.vessel.staticPressurekPa * PhysicsGlobals.KpaToAtmospheres)) * TWR1EngineModuleFX.thrustPercentage / 100F) * offsetMultiplier); //add engine thrust to MaxThrust
-                                                                                                                                                                                                                                                                                                                              // errLine = "17e1";
-                                    TWR1MaxThrustVertical += ((TWR1EngineModuleFX.maxFuelFlow * TWR1EngineModuleFX.g * TWR1EngineModuleFX.atmosphereCurve.Evaluate((float)(TWR1EngineModuleFX.vessel.staticPressurekPa * PhysicsGlobals.KpaToAtmospheres)) * TWR1EngineModuleFX.thrustPercentage / 100F));
-                                }
-                                actualThrustLastFrame += TWR1EngineModuleFX.finalThrust * (float)offsetMultiplier;
+                                offsetMultiplier = 1;
                             }
+
+                            if ((bool)engineModule.Fields.GetValue("throttleLocked") && engineModule.isOperational)//if throttlelocked is true, this is solid rocket booster. then check engine is operational. if the engine is flamedout, disabled via-right click or not yet activated via stage control, isOperational returns false
+                            {
+                                maxThrust += ((engineModule.finalThrust) * offsetMultiplier); //add engine thrust to MaxThrust
+                                maxThrustVertical += (double)(engineModule.finalThrust);
+                                minThrust += ((engineModule.finalThrust) * offsetMultiplier); //add engine thrust to MinThrust since this is an SRB
+                                minThrustVertical += (double)(engineModule.finalThrust);
+                            }
+                            else if (engineModule.isOperational)//we know it is an engine and not a solid rocket booster so:
+                            {
+                                maxThrust += ((engineModule.maxFuelFlow * engineModule.g * engineModule.atmosphereCurve.Evaluate((float)(engineModule.vessel.staticPressurekPa * PhysicsGlobals.KpaToAtmospheres)) * engineModule.thrustPercentage / 100F) * offsetMultiplier); //add engine thrust to MaxThrust
+                                                                                                                                                                                                                                                                                // errLine = "16d1";
+                                maxThrustVertical += ((engineModule.maxFuelFlow * engineModule.g * engineModule.atmosphereCurve.Evaluate((float)(engineModule.vessel.staticPressurekPa * PhysicsGlobals.KpaToAtmospheres)) * engineModule.thrustPercentage / 100F));
+                            }
+                            actualThrustLastFrame += engineModule.finalThrust * (float)offsetMultiplier;
 
                         }
                     }
                 }
             }
-            minThrust = TWR1MinThrust;
-            maxThrust = TWR1MaxThrust;
+            outMinThrust = minThrust;
+            outMaxThrust = maxThrust;
             return actualThrustLastFrame;
         }
+
         void LoadFlightData()
         {
             Log.Info("LoadFlightData");
@@ -220,6 +190,7 @@ namespace ResourceOverview
             {
                 Part p = vessel.Parts[i];
                 vesselDryMass += p.mass;
+                vesselTotalMass += p.mass + p.GetResourceMass();
                 vesselCrewCapacity += p.CrewCapacity;
 
                 foreach (PartResource res in p.Resources)
@@ -238,7 +209,8 @@ namespace ResourceOverview
 
             }
             vesselPartCount = vessel.Parts.Count;
-            vesselMaxThrust = (float)GetThrustInfo(FlightGlobals.ActiveVessel.altitude, out double  minThrust, out double maxThrust);
+            vesselMaxThrust = (float)GetThrustInfo(FlightGlobals.ActiveVessel.altitude, out double minThrust, out double maxThrust);
+
             vesselTotalMass = FlightGlobals.ActiveVessel.GetTotalMass();
             vesselTWR = (vesselMaxThrust / vesselTotalMass) / (float)9.81;
 
@@ -256,14 +228,10 @@ namespace ResourceOverview
                            where part.inverseStage == StageManager.LastStage
                            from engine in part.Modules.OfType<ModuleEngines>()
                            select engine);
-            var enginesfx = (from part in EditorLogic.fetch.ship.parts
-                             where part.inverseStage == StageManager.LastStage
-                             from engine in part.Modules.OfType<ModuleEnginesFX>()
-                             where engine.isEnabled
-                             select engine);
-            vesselMaxThrust = engines.Sum(e => e.thrustPercentage / 100f * e.maxThrust) + enginesfx.Sum(e => e.thrustPercentage / 100f * e.maxThrust);
+            vesselMaxThrust = engines.Sum(e => e.thrustPercentage / 100f * (e.maxThrust - e.minThrust) + e.minThrust);
 
-            vesselTWR = (vesselMaxThrust / vesselTotalMass) / (float)9.81;
+
+            vesselTWR = (vesselMaxThrust / vesselTotalMass) / (float)g;
 
             foreach (Part part in EditorLogic.SortedShipList)
             {
@@ -325,8 +293,35 @@ namespace ResourceOverview
             }
         }
 
+        public static void UpdateActiveFont()
+        {
+            if (KSPSettings.useStockSkin)
+            {
+                if (KSPSettings.useBoldFont)
+                    activeWhiteFont = new GUIStyle(RegisterToolbar.boldStockFont);
+                else
+                    activeWhiteFont = new GUIStyle(RegisterToolbar.stockFont);
+            }
+            else
+            {
+                if (KSPSettings.useBoldFont)
+                    activeWhiteFont = new GUIStyle(RegisterToolbar.boldFont);
+                else
+                    activeWhiteFont = new GUIStyle(RegisterToolbar.font);
+
+            }
+            activeWhiteFont.fontSize = (int)KSPSettings.fontSize;
+            if (KSPSettings.useCompactSpacing)
+                activeWhiteFont.padding = new RectOffset();
+
+            activeWhiteFont.normal.textColor = Color.white;
+            activeGreenFont = new GUIStyle(activeWhiteFont);
+            activeGreenFont.normal.textColor = Color.green;
+        }
+
         protected override void drawGui(int windowID)
         {
+
             if (GUI.Button(new Rect(windowPosition.width - 22, 2, 20, 20), "s"))
             {
                 settingsWindow = gameObject.AddComponent<SettingsWindow>();
@@ -337,16 +332,16 @@ namespace ResourceOverview
             if (HighLogic.LoadedSceneIsFlight || EditorLogic.RootPart != null)
             {
                 reloadVesselData();
-                if (KSPSettings.showTotalMass) GUILayout.Label("Total Mass: " + String.Format("{0:,0.00}", vesselTotalMass), GUILayout.ExpandWidth(true));
-                if (KSPSettings.showDryMass) GUILayout.Label("Dry Mass: " + String.Format("{0:,0.00}", vesselDryMass), GUILayout.ExpandWidth(true));
-                if (KSPSettings.showCrewCapacity) GUILayout.Label("Crew Capacity: " + vesselCrewCapacity, GUILayout.ExpandWidth(true));
-                if (KSPSettings.showPartCount) GUILayout.Label("Part Count: " + vesselPartCount, GUILayout.ExpandWidth(true));
-                if (KSPSettings.showTWR) GUILayout.Label("TWR: " + String.Format("{0:,0.00}", vesselTWR), GUILayout.ExpandWidth(true));
+                if (KSPSettings.showTotalMass) GUILayout.Label("Total Mass: " + String.Format("{0:,0.00}", vesselTotalMass * 1000), activeWhiteFont, GUILayout.ExpandWidth(true));
+                if (KSPSettings.showDryMass) GUILayout.Label("Dry Mass: " + String.Format("{0:,0.00}", vesselDryMass * 1000), activeWhiteFont, GUILayout.ExpandWidth(true));
+                if (KSPSettings.showCrewCapacity) GUILayout.Label("Crew Capacity: " + vesselCrewCapacity, activeWhiteFont, GUILayout.ExpandWidth(true));
+                if (KSPSettings.showPartCount) GUILayout.Label("Part Count: " + vesselPartCount, activeWhiteFont, GUILayout.ExpandWidth(true));
+                if (KSPSettings.showTWR) GUILayout.Label("TWR: " + String.Format("{0:,0.00}", vesselTWR), activeWhiteFont, GUILayout.ExpandWidth(true));
                 GUILayout.Space(10);
 
                 foreach (String key in resourceList.Keys)
                 {
-                    GUILayout.Label(key + ": " + String.Format("{0:,0.00}", resourceList[key].amount) + " / " + String.Format("{0:,0.00}", resourceList[key].maxAmount), GUILayout.ExpandWidth(true));
+                    GUILayout.Label(key + ": " + String.Format("{0:,0.00}", resourceList[key].amount) + " / " + String.Format("{0:,0.00}", resourceList[key].maxAmount), activeWhiteFont, GUILayout.ExpandWidth(true));
                 }
 
             }
@@ -367,7 +362,5 @@ namespace ResourceOverview
 
             KSPSettings.SaveData();
         }
-
-
     }
 }

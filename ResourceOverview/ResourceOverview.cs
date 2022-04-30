@@ -1,11 +1,4 @@
 ﻿using PluginBaseFramework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using UnityEngine;
-using KSP.IO;
 using KSP.UI.Screens;
 using ToolbarControl_NS;
 using static ResourceOverview.RegisterToolbar;
@@ -16,17 +9,15 @@ namespace ResourceOverview
     [KSPAddon(KSPAddon.Startup.FlightAndEditor, false)]
     partial class ResourceOverview : BaseWindow
     {
-        internal static ResourceOverview Instance;
         private static ToolbarControl toolbarControl = null;
 
         internal const string MODID = "ResourceOveriew";
-        internal const string MODNAME = "Resource Overiew";
+        internal const string MODNAME = "Resource Overview";
 
 
         public void Start()
         {
             Log.Info("Start");
-            Instance = this;
 
             if (toolbarControl == null)
             {
@@ -47,7 +38,20 @@ namespace ResourceOverview
             }
 
             KSPSettings.load();
-            KSPSettings.SettingsChanged += new KSPSettings.SettingsChangedEventHandler(onSettingsChanged);
+
+
+            if (HighLogic.LoadedSceneIsFlight)
+            {
+                windowPosition.x = KSPSettings.flightWinX;
+                windowPosition.y = KSPSettings.flightWinY;
+            }
+            if (HighLogic.LoadedSceneIsEditor)
+            {
+                windowPosition.x = KSPSettings.editorWinX;
+                windowPosition.y = KSPSettings.editorWinY;
+            }
+
+            GameEvents.onGameSceneSwitchRequested.Add(onGameSceneSwitchRequested);
 
             GameEvents.onPartRemove.Add(onPartRemove);
             if (HighLogic.LoadedSceneIsEditor)
@@ -56,7 +60,30 @@ namespace ResourceOverview
             }
             if (HighLogic.LoadedSceneIsFlight)
                 SetUpUpdateCoroutine();
+            saved = false;
         }
+
+        bool saved = false;
+        public void onGameSceneSwitchRequested(GameEvents.FromToAction<GameScenes, GameScenes> eData)
+        {
+            if (saved) return;
+            saved = true;
+
+            switch (eData.from)
+            {
+                case GameScenes.FLIGHT:
+                    KSPSettings.flightWinX = windowPosition.x;
+                    KSPSettings.flightWinY = windowPosition.y;
+                    break;
+                case GameScenes.EDITOR:
+                    KSPSettings.editorWinX = windowPosition.x;
+                    KSPSettings.editorWinY = windowPosition.y;
+                    break;
+            }
+
+            KSPSettings.save();
+        }
+
 
         private void onAppLaunchHoverOn()
         {

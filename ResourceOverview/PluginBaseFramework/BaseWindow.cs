@@ -15,6 +15,7 @@ namespace PluginBaseFramework
         internal Rect windowPosition = new Rect();
         internal float windowHeight;
         internal float windowWidth;
+        internal static bool useKSPskin = false;
 
         protected bool _windowVisible = false;
         public bool windowVisible
@@ -55,10 +56,12 @@ namespace PluginBaseFramework
 
         void OnGUI()
         {
-            preDrawGui();
             if (windowVisible || windowHover)
             {
-                windowPosition = GUILayout.Window(windowID, windowPosition, drawGui, windowTitle,
+                if (useKSPskin)
+                    GUI.skin = HighLogic.Skin;
+             preDrawGui();
+               windowPosition = GUILayout.Window(windowID, windowPosition, drawGui, windowTitle,
                     GUILayout.Width(windowWidth), // overwrite values from windowPosition
                     GUILayout.Height(windowHeight));
             }

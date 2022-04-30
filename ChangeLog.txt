@@ -20,3 +20,10 @@ ChangeLog
 		SpaceTuxLibrary
 		ToolbarController
 		ClickThroughBlocker
+
+2.0.0.1
+	Added functionality for stock skin
+	Fixed mass/twr calculations for RO
+	Added adjustable font setttings
+	Added scene specific save locations (editor & flight).  Settings window only has a single location saved
+
