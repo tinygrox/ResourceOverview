@@ -28,4 +28,5 @@ ChangeLog
 	Added scene specific save locations (editor & flight).  Settings window only has a single location saved
 	Added color to fonts
 
-
+2.0.1
+	Added functionality to TrackingStation (this instead of adding another mod: "Resource Details in Tracking Center")

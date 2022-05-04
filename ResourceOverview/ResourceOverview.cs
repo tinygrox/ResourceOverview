@@ -6,7 +6,7 @@ using static ResourceOverview.RegisterToolbar;
 namespace ResourceOverview
 {
 
-    [KSPAddon(KSPAddon.Startup.FlightAndEditor, false)]
+    [KSPAddon(KSPAddon.Startup.AllGameScenes, false)]
     partial class ResourceOverview : BaseWindow
     {
         private static ToolbarControl toolbarControl = null;
@@ -27,7 +27,7 @@ namespace ResourceOverview
                     onAppLaunchToggle, onAppLaunchToggle,
                     onAppLaunchHoverOn, onAppLaunchHoverOff,
                     null, null,
-                    ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.FLIGHT,
+                    ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.FLIGHT| ApplicationLauncher.AppScenes.TRACKSTATION,
                     MODID,
                     "RO_Btn",
                     "ResourceOverview/PluginData/ro_app_button_active.png",
@@ -50,6 +50,10 @@ namespace ResourceOverview
                 windowPosition.x = KSPSettings.editorWinX;
                 windowPosition.y = KSPSettings.editorWinY;
             }
+            if (HighLogic.LoadedScene == GameScenes.TRACKSTATION)
+            {
+                GameEvents.onPlanetariumTargetChanged.Add(activeShipChanged);
+            }
 
             GameEvents.onGameSceneSwitchRequested.Add(onGameSceneSwitchRequested);
 
@@ -58,7 +62,7 @@ namespace ResourceOverview
             {
                 GameEvents.onEditorShipModified.Add(onEditorShipModified);
             }
-            if (HighLogic.LoadedSceneIsFlight)
+            if (HighLogic.LoadedSceneIsFlight || HighLogic.LoadedScene == GameScenes.TRACKSTATION)
                 SetUpUpdateCoroutine();
             saved = false;
         }

@@ -67,6 +67,7 @@
     <Compile Include="ResourceOverview.cs" />
     <Compile Include="ResourceWindow.cs" />
     <Compile Include="SettingsWindow.cs" />
+    <Compile Include="TCShipInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="AssemblyVersion.tt">

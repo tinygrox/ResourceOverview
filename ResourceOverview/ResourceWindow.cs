@@ -53,14 +53,12 @@ namespace ResourceOverview
 
         private void onPartRemove(GameEvents.HostTargetAction<Part, Part> data)
         {
-            Log.Info("onPartRemove");
             setFetchVesselData();
         }
 
 
         void onEditorShipModified(ShipConstruct sc)
         {
-            Log.Info("onEditorShipModified");
             setFetchVesselData();
         }
 
@@ -130,8 +128,9 @@ namespace ResourceOverview
                     float DavonThrottleID = 0;
                     if (part.Modules.Contains("DifferentialThrustEngineModule")) //Devon Throttle Control Installed?
                     {
-                        foreach (PartModule pm in part.Modules)
+                        for (int i1 = 0; i1 < part.Modules.Count; i1++)
                         {
+                            PartModule pm = part.Modules[i1];
 
                             if (pm.moduleName == "DifferentialThrustEngineModule")
                             {
@@ -192,8 +191,9 @@ namespace ResourceOverview
                 vesselTotalMass += p.mass + p.GetResourceMass();
                 vesselCrewCapacity += p.CrewCapacity;
 
-                foreach (PartResource res in p.Resources)
+                for (int i1 = 0; i1 < p.Resources.Count; i1++)
                 {
+                    PartResource res = p.Resources[i1];
                     if (resourceList.ContainsKey(res.resourceName))
                     {
                         //res.info.density
@@ -232,10 +232,12 @@ namespace ResourceOverview
 
             vesselTWR = (vesselMaxThrust / vesselTotalMass) / (float)g;
 
-            foreach (Part part in EditorLogic.SortedShipList)
+            for (int i = 0; i < EditorLogic.SortedShipList.Count; i++)
             {
-                foreach (PartResource res in part.Resources)
+                Part part = EditorLogic.SortedShipList[i];
+                for (int i1 = 0; i1 < part.Resources.Count; i1++)
                 {
+                    PartResource res = part.Resources[i1];
                     if (resourceList.ContainsKey(res.resourceName))
                     {
                         //res.info.density
@@ -250,6 +252,32 @@ namespace ResourceOverview
             }
         }
 
+        void LoadTrackingData()
+        {
+            Log.Info("LoadTrackingData");
+            vesselTotalMass = trackingStationVesselTotalMass;
+            vesselDryMass = trackingStationVesselDryMass;
+            vesselCrewCapacity = trackingStationCrewCapacity;
+            vesselPartCount = trackingStationPartCount;
+
+            foreach (ResourceData r in res.Values)
+            {
+                if (resourceList.ContainsKey(r.name))
+                {
+                    //res.info.density
+                    resourceList[r.name].amount += r.current;
+                    resourceList[r.name].maxAmount += r.max;
+                }
+                else
+                {
+                    resourceList.Add(r.name, new DisplayResource(r.name, r.current, r.max, r.def.density));
+                }
+            }
+            string p = PodStatusText[(int)PodStatus];
+            //windowPosition.width = 0;
+            windowPosition.height = 0;
+        }
+
         private void reloadVesselData()
         {
             if (vesselDataFetched)
@@ -258,9 +286,10 @@ namespace ResourceOverview
             }
             if (HighLogic.LoadedSceneIsEditor)
                 LoadEditorData();
-            else
+            if (HighLogic.LoadedSceneIsFlight)
                 LoadFlightData();
-
+            if (HighLogic.LoadedScene == GameScenes.TRACKSTATION)
+                LoadTrackingData();
             vesselDataFetched = true;
         }
 
@@ -329,9 +358,15 @@ namespace ResourceOverview
 
             GUILayout.BeginVertical();
 
-            if (HighLogic.LoadedSceneIsFlight || EditorLogic.RootPart != null)
+            if (!HighLogic.LoadedSceneIsEditor || EditorLogic.RootPart != null)
             {
                 reloadVesselData();
+                if (HighLogic.LoadedScene == GameScenes.TRACKSTATION)
+                {
+                    GUILayout.Label("Vessel Type: <color=#32cd32>" + vesselType.ToString() + "</color>", activeFont);
+                    if (PodStatus != Statuses.pod)
+                        GUILayout.Label(PodStatusText[(int)PodStatus], activeFont);
+                }
                 if (KSPSettings.showTotalMass)
                 {
                     GUILayout.Label("Total Mass: <color=#32cd32>" + String.Format("{0:,0.00}</color>", vesselTotalMass * 1000), activeFont);
@@ -353,7 +388,7 @@ namespace ResourceOverview
                     GUILayout.Label("TWR: <color=#32cd32>" + String.Format("{0:,0.00}</color>", vesselTWR), activeFont);
                 }
                 GUILayout.Space(10);
-                //GUILayout.Label("<HL>");
+
                 foreach (String key in resourceList.Keys)
                 {
                     GUILayout.Label(key + ": <color=#32cd32>" + String.Format("{0:,0.00}", resourceList[key].amount) + "</color>/<color=#7cfc00>" + String.Format("{0:,0.00}</color>", resourceList[key].maxAmount), activeFont, GUILayout.ExpandWidth(true));
