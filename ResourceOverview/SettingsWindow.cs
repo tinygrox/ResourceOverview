@@ -37,6 +37,22 @@ namespace ResourceOverview
 
         protected override void drawGui(int windowID)
         {
+             bool
+                oshowDryMass = KSPSettings.showDryMass,
+                oshowTotalMass = KSPSettings.showTotalMass,
+                oshowCrewCapacity = KSPSettings.showCrewCapacity,
+                oshowPartCount = KSPSettings.showPartCount,
+                oshowTWR = KSPSettings.showTWR,
+                ouseStockSkin = KSPSettings.useStockSkin,
+                ouseBoldFont = KSPSettings.useBoldFont,
+                ouseCompactSpacing = KSPSettings.useCompactSpacing;
+
+             float 
+                    ofontSize = KSPSettings.fontSize,
+                    ospaceBetween = KSPSettings.spaceBetween,
+                    otransparency = KSPSettings.transparency                    ;
+
+
             GUILayout.BeginVertical();
             KSPSettings.showTotalMass = GUILayout.Toggle(KSPSettings.showTotalMass, "Show Total Mass");
             KSPSettings.showDryMass = GUILayout.Toggle(KSPSettings.showDryMass, "Show Dry Mass");
@@ -48,7 +64,17 @@ namespace ResourceOverview
             KSPSettings.useCompactSpacing = GUILayout.Toggle(KSPSettings.useCompactSpacing, "Use Compact Spacing");
             GUILayout.BeginHorizontal();
             GUILayout.Label("Font Size:");
-            KSPSettings.fontSize = GUILayout.HorizontalSlider(KSPSettings.fontSize, 9f, 15f);
+            KSPSettings.fontSize = GUILayout.HorizontalSlider(KSPSettings.fontSize, 9f, 15f);            
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Label/Data Space:");
+            KSPSettings.spaceBetween = GUILayout.HorizontalSlider(KSPSettings.spaceBetween, 40f, 150f);
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Window Transparency:");
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            KSPSettings.transparency = GUILayout.HorizontalSlider(KSPSettings.transparency, 0f, 255f);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
@@ -64,8 +90,20 @@ namespace ResourceOverview
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
             GUI.DragWindow();
-            ResourceOverview.UpdateActiveFont();
-            ResourceOverview.useKSPskin = KSPSettings.useStockSkin;
+
+            if (
+                oshowDryMass != KSPSettings.showDryMass||
+                oshowTotalMass != KSPSettings.showTotalMass||
+                oshowCrewCapacity != KSPSettings.showCrewCapacity||
+                oshowPartCount != KSPSettings.showPartCount ||
+                oshowTWR != KSPSettings.showTWR ||
+                ouseStockSkin != KSPSettings.useStockSkin ||
+                ouseBoldFont != KSPSettings.useBoldFont ||
+                ouseCompactSpacing != KSPSettings.useCompactSpacing ||
+                ofontSize != KSPSettings.fontSize ||
+                ospaceBetween != KSPSettings.spaceBetween||
+                otransparency != KSPSettings.transparency)
+                ResourceOverview.UpdateActiveFont();
         }
 
         public void OnDestroy()

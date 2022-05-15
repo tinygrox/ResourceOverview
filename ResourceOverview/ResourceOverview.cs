@@ -9,6 +9,8 @@ namespace ResourceOverview
     [KSPAddon(KSPAddon.Startup.AllGameScenes, false)]
     partial class ResourceOverview : BaseWindow
     {
+        internal static ResourceOverview Instance;
+
         private static ToolbarControl toolbarControl = null;
 
         internal const string MODID = "ResourceOveriew";
@@ -18,7 +20,7 @@ namespace ResourceOverview
         public void Start()
         {
             Log.Info("Start");
-
+            Instance = this;
             if (toolbarControl == null)
             {
                 Log.Info("Initting toolbarControl");

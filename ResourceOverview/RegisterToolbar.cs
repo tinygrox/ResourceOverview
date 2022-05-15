@@ -13,6 +13,8 @@ namespace ResourceOverview
         internal static GUIStyle font, stockFont;
         bool initted = false;
 
+        internal static GUIStyle kspWindowStyle;
+
         void Awake()
         {
             if (Log == null)
@@ -30,6 +32,7 @@ namespace ResourceOverview
         {
             if (!initted)
             {
+                Log.Info("RegisterToolbar.OnGUI");
                 initted = true;
                 stockFont = new GUIStyle(GUI.skin.label);
                 font = new GUIStyle(HighLogic.Skin.label);
@@ -41,8 +44,10 @@ namespace ResourceOverview
                 boldStockFont.fontStyle = FontStyle.Bold;
 
                 KSPSettings.load();
-                ResourceOverview.UpdateActiveFont();
+                if (KSPSettings.useStockSkin)
+                    GUI.skin = HighLogic.Skin;
 
+                ResourceOverview.UpdateActiveFont();
             }
         }
         void Start()

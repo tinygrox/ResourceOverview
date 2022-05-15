@@ -30,3 +30,9 @@ ChangeLog
 
 2.0.1
 	Added functionality to TrackingStation (this instead of adding another mod: "Resource Details in Tracking Center")
+
+2.0.2
+	Fixed display of resource name to the display name
+	Fixed incorrect skin being displayed
+	Added code to right-justify the data
+	Added transparency option

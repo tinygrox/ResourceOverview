@@ -18,6 +18,8 @@ namespace ResourceOverview
             useCompactSpacing = false;
 
         static internal float fontSize = 12f;
+        static internal float spaceBetween = 40f;
+        static internal float transparency = 255f;
         internal static float editorWinX, editorWinY, flightWinX, flightWinY;
         internal static float settingsWinX, settingsWinY;
 
@@ -44,6 +46,8 @@ namespace ResourceOverview
             configFileNode.AddValue("useBoldFont", useBoldFont);
             configFileNode.AddValue("useCompactSpacing", useCompactSpacing);
             configFileNode.AddValue("fontSize", fontSize);
+            configFileNode.AddValue("spaceBetween", spaceBetween);
+            configFileNode.AddValue("transparency", transparency);
 
             configFileNode.AddValue("settingsWinX", settingsWinX);
             configFileNode.AddValue("settingsWinY", settingsWinY);
@@ -82,6 +86,8 @@ namespace ResourceOverview
                         useBoldFont = configFileNode.SafeLoad("useBoldFont", useBoldFont);
                         useCompactSpacing = configFileNode.SafeLoad("useCompactSpacing", useCompactSpacing);
                         fontSize = configFileNode.SafeLoad("fontSize", fontSize);
+                        spaceBetween = configFileNode.SafeLoad("spaceBetween", spaceBetween);
+                        transparency = configFileNode.SafeLoad("transparency", transparency);
 
                         editorWinX = configFileNode.SafeLoad("editorWinX", editorWinX);
                         editorWinY = configFileNode.SafeLoad("editorWinY", editorWinY);

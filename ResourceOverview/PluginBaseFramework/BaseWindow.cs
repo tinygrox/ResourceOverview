@@ -11,11 +11,12 @@ namespace PluginBaseFramework
     {
         protected int windowID;
         protected string windowTitle;
+        protected bool useTransparency;
 
         internal Rect windowPosition = new Rect();
         internal float windowHeight;
         internal float windowWidth;
-        internal static bool useKSPskin = false;
+        //internal static bool useKSPskin = false;
 
         protected bool _windowVisible = false;
         public bool windowVisible
@@ -37,13 +38,13 @@ namespace PluginBaseFramework
             }
         }
 
-        public BaseWindow(string title, float width, float height)
+        public BaseWindow(string title, float width, float height, bool useTransparency = false)
         {
             windowTitle = title;
             windowWidth = width;
             windowHeight = height;
+            this.useTransparency = useTransparency;
             windowID = UnityEngine.Random.Range(1000, 2000000) + System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.GetHashCode(); // generate window ID
-            Log.Debug("BaseWindow constructor for " + title);
 
             if (windowPosition.x == 0 && windowPosition.y == 0)
             {
@@ -58,10 +59,13 @@ namespace PluginBaseFramework
         {
             if (windowVisible || windowHover)
             {
-                if (useKSPskin)
+                if (ResourceOverview.KSPSettings.useStockSkin)
                     GUI.skin = HighLogic.Skin;
-             preDrawGui();
-               windowPosition = GUILayout.Window(windowID, windowPosition, drawGui, windowTitle);
+                preDrawGui();
+                if (ResourceOverview.RegisterToolbar.kspWindowStyle == null || !useTransparency)
+                    windowPosition = GUILayout.Window(windowID, windowPosition, drawGui, windowTitle);
+                else
+                    windowPosition = GUILayout.Window(windowID, windowPosition, drawGui, windowTitle, ResourceOverview.RegisterToolbar.kspWindowStyle);
             }
         }
 

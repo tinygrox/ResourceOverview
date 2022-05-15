@@ -27,7 +27,8 @@ namespace ResourceOverview
 
         protected SettingsWindow settingsWindow;
 
-        public ResourceOverview() : base("Resource Overview", 250, 50)
+        //public ResourceOverview() : base("Resource Overview", 250, 50)
+        public ResourceOverview() : base("Resource Overview", 150, 50, true)
         {
 
         }
@@ -194,15 +195,15 @@ namespace ResourceOverview
                 for (int i1 = 0; i1 < p.Resources.Count; i1++)
                 {
                     PartResource res = p.Resources[i1];
-                    if (resourceList.ContainsKey(res.resourceName))
+                    if (resourceList.ContainsKey(res.info.displayName))
                     {
                         //res.info.density
-                        resourceList[res.resourceName].amount += res.amount;
-                        resourceList[res.resourceName].maxAmount += res.maxAmount;
+                        resourceList[res.info.displayName].amount += res.amount;
+                        resourceList[res.info.displayName].maxAmount += res.maxAmount;
                     }
                     else
                     {
-                        resourceList.Add(res.resourceName, new DisplayResource(res.resourceName, res.amount, res.maxAmount, res.info.density));
+                        resourceList.Add(res.info.displayName, new DisplayResource(res.info.displayName, res.amount, res.maxAmount, res.info.density));
                     }
                 }
 
@@ -238,15 +239,15 @@ namespace ResourceOverview
                 for (int i1 = 0; i1 < part.Resources.Count; i1++)
                 {
                     PartResource res = part.Resources[i1];
-                    if (resourceList.ContainsKey(res.resourceName))
+                    if (resourceList.ContainsKey(res.info.displayName))
                     {
                         //res.info.density
-                        resourceList[res.resourceName].amount += res.amount;
-                        resourceList[res.resourceName].maxAmount += res.maxAmount;
+                        resourceList[res.info.displayName].amount += res.amount;
+                        resourceList[res.info.displayName].maxAmount += res.maxAmount;
                     }
                     else
                     {
-                        resourceList.Add(res.resourceName, new DisplayResource(res.resourceName, res.amount, res.maxAmount, res.info.density));
+                        resourceList.Add(res.info.displayName, new DisplayResource(res.info.displayName, res.amount, res.maxAmount, res.info.density));
                     }
                 }
             }
@@ -262,7 +263,7 @@ namespace ResourceOverview
 
             foreach (ResourceData r in res.Values)
             {
-                if (resourceList.ContainsKey(r.name))
+                if (resourceList.ContainsKey(r.def.displayName))
                 {
                     //res.info.density
                     resourceList[r.name].amount += r.current;
@@ -270,7 +271,7 @@ namespace ResourceOverview
                 }
                 else
                 {
-                    resourceList.Add(r.name, new DisplayResource(r.name, r.current, r.max, r.def.density));
+                    resourceList.Add(r.def.displayName, new DisplayResource(r.def.displayName, r.current, r.max, r.def.density));
                 }
             }
             string p = PodStatusText[(int)PodStatus];
@@ -323,6 +324,7 @@ namespace ResourceOverview
 
         public static void UpdateActiveFont()
         {
+            Log.Info("UpdateActiveFont");
             if (KSPSettings.useStockSkin)
             {
                 if (KSPSettings.useBoldFont)
@@ -346,10 +348,81 @@ namespace ResourceOverview
                 activeFont.padding = new RectOffset();
 
             activeFont.normal.textColor = Color.white;
+            if (Instance != null)
+                Instance.windowPosition.width -= 25;
+            SetAlpha(KSPSettings.transparency);
         }
 
+        internal static void SetAlpha(float Alpha)
+        {
+            Log.Info("SetALpha: " + Alpha);
+            GUIStyle workingWindowStyle;
+            
+            // Not ideal, should really be able to delete the old kspWindowStyle first, but since this doesn't happen 
+            // too often, it's ok to lose a few hundred bytes of storage here.
+
+            RegisterToolbar.kspWindowStyle = new GUIStyle(GUI.skin.window);
+            //if (kspWindowStyle.active.background == null)
+            {
+                kspWindowStyle.active.background = CopyTexture2D(GUI.skin.window.active.background);
+            }
+
+            workingWindowStyle = RegisterToolbar.kspWindowStyle;
+
+            SetAlphaFor(Alpha, workingWindowStyle, GUI.skin.window.active.background, workingWindowStyle.active.textColor);
+        }
+
+        internal static Texture2D CopyTexture2D(Texture2D originalTexture)
+        {
+            Texture2D copyTexture = new Texture2D(originalTexture.width, originalTexture.height);
+            copyTexture.SetPixels(originalTexture.GetPixels());
+            copyTexture.Apply();
+            return copyTexture;
+        }
+
+        static void SetAlphaFor(float Alpha, GUIStyle style, Texture2D backgroundTexture, Color color)
+        {
+            Texture2D copyTexture = CopyTexture2D(backgroundTexture);
+
+            var pixels = copyTexture.GetPixels32();
+            for (int i = 0; i < pixels.Length; ++i)
+                pixels[i].a = (byte)Alpha;
+
+
+            copyTexture.SetPixels32(pixels);
+            copyTexture.Apply();
+
+            style.active.background =
+                style.normal.background =
+                style.hover.background =
+                style.onNormal.background =
+                style.onHover.background =
+                style.onActive.background =
+                style.focused.background =
+                style.onFocused.background =
+                style.onNormal.background =
+                style.normal.background = copyTexture;
+
+            style.active.textColor =
+                style.normal.textColor =
+                style.hover.textColor =
+                style.onNormal.textColor =
+                style.onHover.textColor =
+                style.onActive.textColor =
+                style.focused.textColor =
+                style.onFocused.textColor =
+                style.onNormal.textColor =
+                style.normal.textColor = color;
+        }
+
+        bool initted = false;
         protected override void drawGui(int windowID)
         {
+            if (!initted)
+            {
+                UpdateActiveFont();
+                initted = true;
+            }
 
             if (GUI.Button(new Rect(windowPosition.width - 22, 2, 20, 20), "s"))
             {
@@ -363,35 +436,42 @@ namespace ResourceOverview
                 reloadVesselData();
                 if (HighLogic.LoadedScene == GameScenes.TRACKSTATION)
                 {
-                    GUILayout.Label("Vessel Type: <color=#32cd32>" + vesselType.ToString() + "</color>", activeFont);
+                    //GUILayout.Label("Vessel Type: <color=#32cd32>" + vesselType.ToString() + "</color>", activeFont);
+                    ShowLabel("Vessel Type:", "<color=#32cd32>" + vesselType.ToString() + "</color>");
                     if (PodStatus != Statuses.pod)
                         GUILayout.Label(PodStatusText[(int)PodStatus], activeFont);
                 }
                 if (KSPSettings.showTotalMass)
                 {
-                    GUILayout.Label("Total Mass: <color=#32cd32>" + String.Format("{0:,0.00}</color>", vesselTotalMass * 1000), activeFont);
+                    //GUILayout.Label("Total Mass: <color=#32cd32>" + String.Format("{0:,0.00}</color>", vesselTotalMass * 1000), activeFont);
+                    ShowLabel("Total Mass:", "<color=#32cd32>" + String.Format("{0:,0.00}</color>", vesselTotalMass * 1000));
                 }
                 if (KSPSettings.showDryMass)
                 {
-                    GUILayout.Label("Dry Mass: <color=#32cd32>" + String.Format("{0:,0.00}</color>", vesselDryMass * 1000), activeFont);
+                    //GUILayout.Label("Dry Mass: <color=#32cd32>" + String.Format("{0:,0.00}</color>", vesselDryMass * 1000), activeFont);
+                    ShowLabel("Dry Mass:", "<color=#32cd32>" + String.Format("{0:,0.00}</color>", vesselDryMass * 1000));
                 }
                 if (KSPSettings.showCrewCapacity)
                 {
-                    GUILayout.Label("Crew Capacity: <color=#32cd32>" + vesselCrewCapacity + "</color>", activeFont);
+                    //GUILayout.Label("Crew Capacity: <color=#32cd32>" + vesselCrewCapacity + "</color>", activeFont);
+                    ShowLabel("Crew Capacity:", "<color=#32cd32>" + vesselCrewCapacity + "</color>");
                 }
                 if (KSPSettings.showPartCount)
                 {
-                    GUILayout.Label("Part Count: <color=#32cd32>" + vesselPartCount + "</color>", activeFont);
+                    //GUILayout.Label("Part Count: <color=#32cd32>" + vesselPartCount + "</color>", activeFont);
+                    ShowLabel("Part Count:", "<color=#32cd32>" + vesselPartCount + "</color>");
                 }
                 if (KSPSettings.showTWR)
                 {
-                    GUILayout.Label("TWR: <color=#32cd32>" + String.Format("{0:,0.00}</color>", vesselTWR), activeFont);
+                    //GUILayout.Label("TWR: <color=#32cd32>" + String.Format("{0:,0.00}</color>", vesselTWR), activeFont);
+                    ShowLabel("TWR:", "<color=#32cd32>" + String.Format("{0:,0.00}</color>", vesselTWR));
                 }
                 GUILayout.Space(10);
 
                 foreach (String key in resourceList.Keys)
                 {
-                    GUILayout.Label(key + ": <color=#32cd32>" + String.Format("{0:,0.00}", resourceList[key].amount) + "</color>/<color=#7cfc00>" + String.Format("{0:,0.00}</color>", resourceList[key].maxAmount), activeFont, GUILayout.ExpandWidth(true));
+                    //GUILayout.Label(key + ": <color=#32cd32>" + String.Format("{0:,0.00}", resourceList[key].amount) + "</color>/<color=#7cfc00>" + String.Format("{0:,0.00}</color>", resourceList[key].maxAmount), activeFont, GUILayout.ExpandWidth(true));
+                    ShowLabel(key + ":", "<color=#32cd32>" + String.Format("{0:,0.00}", resourceList[key].amount) + "</color>/<color=#7cfc00>" + String.Format("{0:,0.00}</color>", resourceList[key].maxAmount));
                 }
 
             }
@@ -403,6 +483,31 @@ namespace ResourceOverview
             GUI.DragWindow();
         }
 
+        //float maxWidth = 0;
+        void ShowLabel(string label, string data)
+        {
+            var width = Math.Min(windowPosition.width + 10, 400);
+
+            GUIContent labelContent = new GUIContent(label);
+            GUIContent dataContent = new GUIContent(data);
+
+            Vector2 labelSize = activeFont.CalcSize(labelContent);
+            Vector2 dataSize = activeFont.CalcSize(dataContent);
+
+            float calcWidth = labelSize.x + dataSize.x + 2 * (activeFont.padding.left + activeFont.padding.right);
+            //maxWidth = Math.Max(maxWidth, calcWidth);
+            float unusedWidth = Math.Max(KSPSettings.spaceBetween, width - calcWidth - 10);
+
+            //Log.Info("ShowLabel, width: " + width + ", calcWidth: " + calcWidth + ", unusedWidth: " + unusedWidth);
+            using (new GUILayout.HorizontalScope())
+            {
+                GUILayout.Label(label, activeFont, GUILayout.Width(labelSize.x));
+                GUILayout.Space(unusedWidth - 30);
+                //GUILayout.FlexibleSpace();
+                GUILayout.Label(data, activeFont, GUILayout.Width(dataSize.x));
+            }
+
+        }
         void OnDestroy()
         {
             Log.Info("window destroy");
