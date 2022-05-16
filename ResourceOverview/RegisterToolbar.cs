@@ -13,6 +13,8 @@ namespace ResourceOverview
         internal static GUIStyle font, stockFont;
         bool initted = false;
 
+        internal static GUIStyle stockWindow;
+        internal static GUIStyle kspWindow;
         internal static GUIStyle kspWindowStyle;
 
         void Awake()
@@ -43,10 +45,15 @@ namespace ResourceOverview
                 boldStockFont = new GUIStyle(GUI.skin.label);
                 boldStockFont.fontStyle = FontStyle.Bold;
 
+                stockWindow = new GUIStyle(GUI.skin.window);
+                kspWindow = new GUIStyle(HighLogic.Skin.window);
+
                 KSPSettings.load();
+
                 if (KSPSettings.useStockSkin)
                     GUI.skin = HighLogic.Skin;
 
+                
                 ResourceOverview.UpdateActiveFont();
             }
         }

@@ -357,19 +357,27 @@ namespace ResourceOverview
         {
             Log.Info("SetALpha: " + Alpha);
             GUIStyle workingWindowStyle;
-            
+
             // Not ideal, should really be able to delete the old kspWindowStyle first, but since this doesn't happen 
             // too often, it's ok to lose a few hundred bytes of storage here.
 
-            RegisterToolbar.kspWindowStyle = new GUIStyle(GUI.skin.window);
-            //if (kspWindowStyle.active.background == null)
-            {
-                kspWindowStyle.active.background = CopyTexture2D(GUI.skin.window.active.background);
-            }
+            if (KSPSettings.useStockSkin)
+                RegisterToolbar.kspWindowStyle = new GUIStyle(RegisterToolbar.kspWindow);
+            else
+                RegisterToolbar.kspWindowStyle = new GUIStyle(RegisterToolbar.stockWindow);
 
             workingWindowStyle = RegisterToolbar.kspWindowStyle;
 
-            SetAlphaFor(Alpha, workingWindowStyle, GUI.skin.window.active.background, workingWindowStyle.active.textColor);
+            if (GUI.skin == null)
+                Log.Error("SetAlpha, GUI.skin is null");
+            if (GUI.skin.window == null)
+                Log.Error("SetAlpha, GUI.skin.window is null");
+            if (GUI.skin.window.active == null)
+                Log.Error("SetAlpha, GUI.skin.window.active is null");
+            if (GUI.skin.window.active.background == null)
+                Log.Error("SetAlpha, GUI.skin.window.active.background is null");
+            else
+                SetAlphaFor(Alpha, workingWindowStyle, kspWindowStyle.active.background, workingWindowStyle.active.textColor);
         }
 
         internal static Texture2D CopyTexture2D(Texture2D originalTexture)

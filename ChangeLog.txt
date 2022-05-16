@@ -36,3 +36,6 @@ ChangeLog
 	Fixed incorrect skin being displayed
 	Added code to right-justify the data
 	Added transparency option
+
+2.0.2.1
+	Fixed error on some installs where mod would generate nullrefs and not work
