@@ -32,8 +32,8 @@ namespace ResourceOverview
                     ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.FLIGHT| ApplicationLauncher.AppScenes.TRACKSTATION,
                     MODID,
                     "RO_Btn",
-                    "ResourceOverview/PluginData/ro_app_button_active.png",
-                    "ResourceOverview/PluginData/ro_app_button.png",
+                    "ResourceOverview/PluginData/ro_app_button_active",
+                    "ResourceOverview/PluginData/ro_app_button",
                     "ResourceOverview/PluginData/ro_toolbar_button_active",
                     "ResourceOverview/PluginData/ro_toolbar_button",
                     MODNAME);

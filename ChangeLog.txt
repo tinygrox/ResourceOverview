@@ -39,3 +39,6 @@ ChangeLog
 
 2.0.2.1
 	Fixed error on some installs where mod would generate nullrefs and not work
+
+2.0.2.2
+	Fixed missing image for Blizzy toolbar button
