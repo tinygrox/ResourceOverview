@@ -42,3 +42,6 @@ ChangeLog
 
 2.0.2.2
 	Fixed missing image for Blizzy toolbar button
+
+2.0.2.3 
+	Fixed small memory leak when not releasing events being used

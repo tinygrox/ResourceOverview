@@ -69,6 +69,17 @@ namespace ResourceOverview
             saved = false;
         }
 
+        void OnDestroy()
+        {
+            if (HighLogic.LoadedScene == GameScenes.TRACKSTATION)
+                GameEvents.onPlanetariumTargetChanged.Remove(activeShipChanged);
+
+            GameEvents.onGameSceneSwitchRequested.Remove(onGameSceneSwitchRequested);
+
+            if (HighLogic.LoadedSceneIsEditor)
+                GameEvents.onEditorShipModified.Remove(onEditorShipModified);
+
+        }
         bool saved = false;
         public void onGameSceneSwitchRequested(GameEvents.FromToAction<GameScenes, GameScenes> eData)
         {
