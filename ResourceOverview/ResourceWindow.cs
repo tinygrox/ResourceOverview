@@ -519,14 +519,20 @@ namespace ResourceOverview
         void OnDestroy()
         {
             Log.Info("window destroy");
-            GameEvents.onPartRemove.Remove(onPartRemove);
-            if (HighLogic.LoadedScene == GameScenes.TRACKSTATION)
+            if (onPlanetariumTargetChangedLoaded)
+            {
                 GameEvents.onPlanetariumTargetChanged.Remove(activeShipChanged);
-
+                onPlanetariumTargetChangedLoaded = false;
+            }
             GameEvents.onGameSceneSwitchRequested.Remove(onGameSceneSwitchRequested);
 
-            if (HighLogic.LoadedSceneIsEditor)
+            GameEvents.onPartRemove.Remove(onPartRemove);
+
+            if (onEditorShipModifiedLoaded)
+            {
                 GameEvents.onEditorShipModified.Remove(onEditorShipModified);
+                onEditorShipModifiedLoaded = false;
+            }
 
 
             KSPSettings.SaveData();

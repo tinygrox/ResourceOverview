@@ -45,3 +45,6 @@ ChangeLog
 
 2.0.2.3 
 	Fixed small memory leak when not releasing events being used
+
+2.0.2.4
+	Fixed another memory leak, same issue as before

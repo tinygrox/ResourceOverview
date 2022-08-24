@@ -55,19 +55,22 @@ namespace ResourceOverview
             if (HighLogic.LoadedScene == GameScenes.TRACKSTATION)
             {
                 GameEvents.onPlanetariumTargetChanged.Add(activeShipChanged);
+                onPlanetariumTargetChangedLoaded = true;
             }
-
             GameEvents.onGameSceneSwitchRequested.Add(onGameSceneSwitchRequested);
 
             GameEvents.onPartRemove.Add(onPartRemove);
+
             if (HighLogic.LoadedSceneIsEditor)
             {
                 GameEvents.onEditorShipModified.Add(onEditorShipModified);
+                onEditorShipModifiedLoaded = true;
             }
             if (HighLogic.LoadedSceneIsFlight || HighLogic.LoadedScene == GameScenes.TRACKSTATION)
                 SetUpUpdateCoroutine();
             saved = false;
         }
+        bool onEditorShipModifiedLoaded = false, onPlanetariumTargetChangedLoaded = false;
 
         bool saved = false;
         public void onGameSceneSwitchRequested(GameEvents.FromToAction<GameScenes, GameScenes> eData)

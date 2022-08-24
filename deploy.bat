@@ -11,6 +11,8 @@ set H=%KSPDIR%
 
 rem set H=R:\KSP_1.12.3_Career-Dev-JNSQ
 
+set H=R:\KSP_1.12.3_test
+
 set GAMEDIR=ResourceOverview
 set GAMEDATA="GameData"
 set VERSIONFILE=%GAMEDIR%.version
