@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using KSP.UI.Screens;
-
+using KSP.Localization;
 using PluginBaseFramework;
 using static ResourceOverview.RegisterToolbar;
 
@@ -445,47 +445,47 @@ namespace ResourceOverview
                 if (HighLogic.LoadedScene == GameScenes.TRACKSTATION)
                 {
                     //GUILayout.Label("Vessel Type: <color=#32cd32>" + vesselType.ToString() + "</color>", activeFont);
-                    ShowLabel("Vessel Type:", "<color=#32cd32>" + vesselType.ToString() + "</color>");
+                    ShowLabel(Localizer.Format("载具类型："), "<color=#32cd32>" + vesselType.ToString() + "</color>"); // "Vessel Type:"
                     if (PodStatus != Statuses.pod)
                         GUILayout.Label(PodStatusText[(int)PodStatus], activeFont);
                 }
                 if (KSPSettings.showTotalMass)
                 {
                     //GUILayout.Label("Total Mass: <color=#32cd32>" + String.Format("{0:,0.00}</color>", vesselTotalMass * 1000), activeFont);
-                    ShowLabel("Total Mass:", "<color=#32cd32>" + String.Format("{0:,0.00}</color>", vesselTotalMass * 1000));
+                    ShowLabel(Localizer.Format("总质量："), "<color=#32cd32>" + String.Format("{0:,0.00}</color>", vesselTotalMass * 1000)); // "Total Mass:"
                 }
                 if (KSPSettings.showDryMass)
                 {
                     //GUILayout.Label("Dry Mass: <color=#32cd32>" + String.Format("{0:,0.00}</color>", vesselDryMass * 1000), activeFont);
-                    ShowLabel("Dry Mass:", "<color=#32cd32>" + String.Format("{0:,0.00}</color>", vesselDryMass * 1000));
+                    ShowLabel(Localizer.Format("干质量："), "<color=#32cd32>" + String.Format("{0:,0.00}</color>", vesselDryMass * 1000)); // "Dry Mass:"
                 }
                 if (KSPSettings.showCrewCapacity)
                 {
                     //GUILayout.Label("Crew Capacity: <color=#32cd32>" + vesselCrewCapacity + "</color>", activeFont);
-                    ShowLabel("Crew Capacity:", "<color=#32cd32>" + vesselCrewCapacity + "</color>");
+                    ShowLabel(Localizer.Format("乘员容量："), "<color=#32cd32>" + vesselCrewCapacity + "</color>"); // "Crew Capacity:"
                 }
                 if (KSPSettings.showPartCount)
                 {
                     //GUILayout.Label("Part Count: <color=#32cd32>" + vesselPartCount + "</color>", activeFont);
-                    ShowLabel("Part Count:", "<color=#32cd32>" + vesselPartCount + "</color>");
+                    ShowLabel(Localizer.Format("部件数量："), "<color=#32cd32>" + vesselPartCount + "</color>"); // "Part Count:"
                 }
                 if (KSPSettings.showTWR)
                 {
                     //GUILayout.Label("TWR: <color=#32cd32>" + String.Format("{0:,0.00}</color>", vesselTWR), activeFont);
-                    ShowLabel("TWR:", "<color=#32cd32>" + String.Format("{0:,0.00}</color>", vesselTWR));
+                    ShowLabel(Localizer.Format("推重比："), "<color=#32cd32>" + String.Format("{0:,0.00}</color>", vesselTWR)); // "TWR:"
                 }
                 GUILayout.Space(10);
 
                 foreach (String key in resourceList.Keys)
                 {
                     //GUILayout.Label(key + ": <color=#32cd32>" + String.Format("{0:,0.00}", resourceList[key].amount) + "</color>/<color=#7cfc00>" + String.Format("{0:,0.00}</color>", resourceList[key].maxAmount), activeFont, GUILayout.ExpandWidth(true));
-                    ShowLabel(key + ":", "<color=#32cd32>" + String.Format("{0:,0.00}", resourceList[key].amount) + "</color>/<color=#7cfc00>" + String.Format("{0:,0.00}</color>", resourceList[key].maxAmount));
+                    ShowLabel(key + ":", "<color=#32cd32>" + String.Format("{0:,0.00}", resourceList[key].amount) + "</color>/<color=#7cfc00>" + String.Format("{0:,0.00}</color>", resourceList[key].maxAmount)); // 
                 }
 
             }
             if (resourceList.Count == 0)
             {
-                GUILayout.Label("No resources to display!", GUILayout.ExpandWidth(true));
+                GUILayout.Label(Localizer.Format("无资源显示！"), GUILayout.ExpandWidth(true)); // "No resources to display!"
             }
             GUILayout.EndVertical();
             GUI.DragWindow();
