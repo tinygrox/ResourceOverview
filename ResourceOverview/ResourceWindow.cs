@@ -28,7 +28,7 @@ namespace ResourceOverview
         protected SettingsWindow settingsWindow;
 
         //public ResourceOverview() : base("Resource Overview", 250, 50)
-        public ResourceOverview() : base("Resource Overview", 150, 50, true)
+        public ResourceOverview() : base("资源总览", 150, 50, true) // "Resource Overview"
         {
 
         }
@@ -203,6 +203,11 @@ namespace ResourceOverview
                     }
                     else
                     {
+                        if (res.info.name.StartsWith("_"))
+                        {
+                            Log.Warn($"now resource is {res.info.name}, which start with '_'!");
+                            continue;
+                        }
                         resourceList.Add(res.info.displayName, new DisplayResource(res.info.displayName, res.amount, res.maxAmount, res.info.density));
                     }
                 }
@@ -504,15 +509,17 @@ namespace ResourceOverview
 
             float calcWidth = labelSize.x + dataSize.x + 2 * (activeFont.padding.left + activeFont.padding.right);
             //maxWidth = Math.Max(maxWidth, calcWidth);
-            float unusedWidth = Math.Max(KSPSettings.spaceBetween, width - calcWidth - 10);
+            // float unusedWidth = Math.Max(KSPSettings.spaceBetween, width - calcWidth - 10);
 
             //Log.Info("ShowLabel, width: " + width + ", calcWidth: " + calcWidth + ", unusedWidth: " + unusedWidth);
             using (new GUILayout.HorizontalScope())
             {
+                GUILayout.BeginHorizontal();
                 GUILayout.Label(label, activeFont, GUILayout.Width(labelSize.x));
-                GUILayout.Space(unusedWidth - 30);
-                //GUILayout.FlexibleSpace();
+                // GUILayout.Space(unusedWidth - 30);
+                GUILayout.FlexibleSpace();
                 GUILayout.Label(data, activeFont, GUILayout.Width(dataSize.x));
+                GUILayout.EndHorizontal();
             }
 
         }
