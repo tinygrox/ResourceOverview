@@ -14,7 +14,7 @@ namespace ResourceOverview
     class SettingsWindow : BaseWindow
     {
         internal static SettingsWindow Instance;
-        public SettingsWindow() : base("Resource Overview Settings", 200, 160)
+        public SettingsWindow() : base("资源总览设置", 200, 160) // "Resource Overview Settings"
         {
 
         }
@@ -54,35 +54,35 @@ namespace ResourceOverview
 
 
             GUILayout.BeginVertical();
-            KSPSettings.showTotalMass = GUILayout.Toggle(KSPSettings.showTotalMass, "Show Total Mass");
-            KSPSettings.showDryMass = GUILayout.Toggle(KSPSettings.showDryMass, "Show Dry Mass");
-            KSPSettings.showCrewCapacity = GUILayout.Toggle(KSPSettings.showCrewCapacity, "Show Crew Capacity");
-            KSPSettings.showPartCount = GUILayout.Toggle(KSPSettings.showPartCount, "Show Part Count");
-            KSPSettings.showTWR = GUILayout.Toggle(KSPSettings.showTWR, "Show TWR");
-            KSPSettings.useStockSkin = GUILayout.Toggle(KSPSettings.useStockSkin, "Use Stock Skin");
-            KSPSettings.useBoldFont = GUILayout.Toggle(KSPSettings.useBoldFont, "Use Bold Font");
-            KSPSettings.useCompactSpacing = GUILayout.Toggle(KSPSettings.useCompactSpacing, "Use Compact Spacing");
+            KSPSettings.showTotalMass = GUILayout.Toggle(KSPSettings.showTotalMass, "显示总质量"); // "Show Total Mass"
+            KSPSettings.showDryMass = GUILayout.Toggle(KSPSettings.showDryMass, "显示干质量"); // "Show Dry Mass"
+            KSPSettings.showCrewCapacity = GUILayout.Toggle(KSPSettings.showCrewCapacity, "显示乘员容量"); // "Show Crew Capacity"
+            KSPSettings.showPartCount = GUILayout.Toggle(KSPSettings.showPartCount, "显示部件数"); // "Show Part Count"
+            KSPSettings.showTWR = GUILayout.Toggle(KSPSettings.showTWR, "显示推重比"); // "Show TWR"
+            KSPSettings.useStockSkin = GUILayout.Toggle(KSPSettings.useStockSkin, "原版风格"); // "Use Stock Skin"
+            KSPSettings.useBoldFont = GUILayout.Toggle(KSPSettings.useBoldFont, "粗字体"); // "Use Bold Font"
+            KSPSettings.useCompactSpacing = GUILayout.Toggle(KSPSettings.useCompactSpacing, "紧凑排列"); // "Use Compact Spacing"
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Font Size:");
+            GUILayout.Label("字体大小"); // "Font Size:"
             KSPSettings.fontSize = GUILayout.HorizontalSlider(KSPSettings.fontSize, 9f, 15f);            
             GUILayout.EndHorizontal();
+            // GUILayout.BeginHorizontal();
+            // GUILayout.Label("标签/数据空格数"); // "Label/Data Space:"
+            // KSPSettings.spaceBetween = GUILayout.HorizontalSlider(KSPSettings.spaceBetween, 40f, 150f);
+            // GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Label/Data Space:");
-            KSPSettings.spaceBetween = GUILayout.HorizontalSlider(KSPSettings.spaceBetween, 40f, 150f);
-            GUILayout.EndHorizontal();
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Window Transparency:");
+            GUILayout.Label("窗口透明度"); // "Window Transparency:"
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             KSPSettings.transparency = GUILayout.HorizontalSlider(KSPSettings.transparency, 0f, 255f);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Save"))
+            if (GUILayout.Button("保存")) // "Save"
             {
                 saveSettings();
             }
-            if (GUILayout.Button("Close"))
+            if (GUILayout.Button("关闭")) // "Close"
             {
                 windowVisible = false;
                 Destroy(this);
