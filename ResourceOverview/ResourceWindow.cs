@@ -205,7 +205,7 @@ namespace ResourceOverview
                     {
                         if (res.info.name.StartsWith("_"))
                         {
-                            Log.Warn($"now resource is {res.info.name}, which start with '_'!");
+                            // Log.Info($"now resource is {res.info.name}, which start with '_'!");
                             continue;
                         }
                         resourceList.Add(res.info.displayName, new DisplayResource(res.info.displayName, res.amount, res.maxAmount, res.info.density));
@@ -252,6 +252,10 @@ namespace ResourceOverview
                     }
                     else
                     {
+                        if (res.info.name.StartsWith("_"))
+                        {
+                            continue;
+                        }
                         resourceList.Add(res.info.displayName, new DisplayResource(res.info.displayName, res.amount, res.maxAmount, res.info.density));
                     }
                 }
@@ -276,6 +280,10 @@ namespace ResourceOverview
                 }
                 else
                 {
+                    if (r.def.name.StartsWith("_"))
+                    {
+                        continue;
+                    }
                     resourceList.Add(r.def.displayName, new DisplayResource(r.def.displayName, r.current, r.max, r.def.density));
                 }
             }
@@ -429,6 +437,47 @@ namespace ResourceOverview
         }
 
         bool initted = false;
+
+        private string getvesseltypedisplayName(VesselType v)
+        {
+            switch(v)
+            {
+                case VesselType.Base: 
+                    return Localizer.Format("#autoLoc_6002178");
+                case VesselType.Debris:
+                    return Localizer.Format("#autoLOC_900676");
+                case VesselType.DeployedGroundPart:
+                    return Localizer.Format("#autoLOC_6009000");
+                case VesselType.DeployedScienceController:
+                    return Localizer.Format("#autoLOC_8002227");
+                case VesselType.DeployedSciencePart:
+                    return Localizer.Format("#autoLOC_8002223");
+                case VesselType.DroppedPart:
+                    return Localizer.Format("#autoLOC_6006094");
+                case VesselType.EVA:
+                    return "EVA";
+                case VesselType.Flag:
+                    return Localizer.Format("#autoLOC_8007221");
+                case VesselType.Lander:
+                    return Localizer.Format("#autoLOC_900686");
+                case VesselType.Plane:
+                    return Localizer.Format("#autoLOC_900685");
+                case VesselType.Probe:
+                    return Localizer.Format("#autoLOC_900681");
+                case VesselType.Relay:
+                    return Localizer.Format("#autoLOC_900687");
+                case VesselType.Rover:
+                    return Localizer.Format("#autoLOC_900683");
+                case VesselType.Ship:
+                    return Localizer.Format("#autoLOC_900684");
+                case VesselType.SpaceObject:
+                    return Localizer.Format("#autoLoc_6002177");
+                case VesselType.Station:
+                    return Localizer.Format("#autoLOC_900679");
+                default:
+                    return Localizer.Format("#autoLOC_6002223");
+            }
+        }
         protected override void drawGui(int windowID)
         {
             if (!initted)
@@ -450,7 +499,8 @@ namespace ResourceOverview
                 if (HighLogic.LoadedScene == GameScenes.TRACKSTATION)
                 {
                     //GUILayout.Label("Vessel Type: <color=#32cd32>" + vesselType.ToString() + "</color>", activeFont);
-                    ShowLabel(Localizer.Format("载具类型："), "<color=#32cd32>" + vesselType.ToString() + "</color>"); // "Vessel Type:"
+                    // ShowLabel(Localizer.Format("载具类型："), "<color=#32cd32>" + vesselType.ToString() + "</color>"); // "Vessel Type:"
+                    ShowLabel(Localizer.Format("载具类型："), "<color=#32cd32>" + getvesseltypedisplayName(vesselType) + "</color>"); // "Vessel Type:"
                     if (PodStatus != Statuses.pod)
                         GUILayout.Label(PodStatusText[(int)PodStatus], activeFont);
                 }
@@ -484,7 +534,11 @@ namespace ResourceOverview
                 foreach (String key in resourceList.Keys)
                 {
                     //GUILayout.Label(key + ": <color=#32cd32>" + String.Format("{0:,0.00}", resourceList[key].amount) + "</color>/<color=#7cfc00>" + String.Format("{0:,0.00}</color>", resourceList[key].maxAmount), activeFont, GUILayout.ExpandWidth(true));
-                    ShowLabel(key + ":", "<color=#32cd32>" + String.Format("{0:,0.00}", resourceList[key].amount) + "</color>/<color=#7cfc00>" + String.Format("{0:,0.00}</color>", resourceList[key].maxAmount)); // 
+                    ShowLabel(key + ":", ((resourceList[key].amount >= resourceList[key].maxAmount) ? 
+                        String.Format("<color=#7cfc00>{0:,0.00}</color>", resourceList[key].amount) :
+                        (resourceList[key].amount < 0.00001 ? 
+                        String.Format("<color=#a9a12a>{0:,0.00}</color>", resourceList[key].amount) :
+                        String.Format("<color=#32cd32>{0:,0.00}</color>", resourceList[key].amount))) + "/" + String.Format("<color=#7cfc00>{0:,0.00}</color>", resourceList[key].maxAmount));
                 }
 
             }
