@@ -18,12 +18,13 @@ namespace ResourceOverview
 	{
 		VesselType vesselType;
 
+
 		float trackingStationVesselTotalMass;
 		float trackingStationVesselDryMass;
 		int trackingStationCrewCapacity;
 		int trackingStationPartCount;
 
-		List<string> PodStatusText = new List<string> { "No command pod", "Has command seat", "ProbeCore" };
+		List<string> PodStatusText = new List<string> { "无指令舱", "有操作椅", "探测器核心" }; // "No command pod", "Has command seat", "ProbeCore"
 		public enum Statuses { none, seat, pod }
 
 		public Statuses PodStatus = Statuses.none;
